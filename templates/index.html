@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+    <title>PCB DEFECT DETECTION</title>
+</head>
+<body>
+    <div class="logo">    
+        <img src="/static/logome.png" alt="">
+        <h1>PCB DEFECT DETECTION</h1>
+    </div>
+        
+    <div class="container">
+        <div class="detected-container">
+            {% if img_path %}
+            <div class="detect">
+                <h2>Detected Image</h2>
+            </div>
+            <div class="image-box">
+                <img src="{{ img_path }}" alt="Detected Image">
+            </div>
+            {% else %}
+            <div class="image-box">
+                <p>No image uploaded</p>
+            </div>
+            {% endif %}
+            
+            <div class="from-file-btn">
+                <form action="/predict" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="image" id="file-input" accept="image/*" capture="camera" onchange="displayFileName()">
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" id="file-input" accept="image/*" capture="camera" onchange="displayFileName()">
+                        <label for="file-input" class="file-label">Choose file</label>
+                        <!-- เพิ่มส่วนนี้เพื่อแสดงชื่อไฟล์ -->
+                        <span id="file-name">No file chosen</span>
+                    </div>
+                    <button type="submit" class="btn">Predict</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="cropped-container">
+            {% if cropped_images %}
+            <h2>Crop Images</h2>
+            {% for crop in cropped_images %}
+            <div class="cropped-image-wrapper">
+                <img src="{{ crop }}" alt="Cropped PCB">
+                <div class="prediction-text">
+                    <strong>Crop {{ loop.index }}:</strong> Predicted result: <br>
+                    {{ details[loop.index0].class }} (Confidence = {{ details[loop.index0].confidence | round(2) }}%)
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function displayFileName() {
+            var input = document.getElementById('file-input');
+            var fileName = input.files[0].name;  // ดึงชื่อไฟล์ที่เลือก
+            var fileNameSpan = document.getElementById('file-name');
+            fileNameSpan.textContent = fileName;  // อัปเดตชื่อไฟล์ใน <span>
+        }
+    </script>
+</body>
+</html>
